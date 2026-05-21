@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead Scoring · {{TITLE}}</title>
+<style>
+:root {
+  --navy: #0B1A2B;
+  --navy-soft: #1A2A3F;
+  --teal: #3ECFA0;
+  --teal-soft: #E6F8F0;
+  --cream: #F5F1EB;
+  --cream-soft: #FAF8F4;
+  --text: #1A1F2B;
+  --text-mute: #5C6675;
+  --line: #E6E3DC;
+  --warn: #E89A3C;
+  --warn-soft: #FBF1E1;
+  --danger: #B85450;
+  --danger-soft: #F5E5E3;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: var(--cream-soft);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+/* HEADER */
+header.hero {
+  background: var(--navy);
+  color: #fff;
+  padding: 36px 0 28px;
+  border-bottom: 4px solid var(--teal);
+}
+.hero h1 {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  letter-spacing: -0.5px;
+}
+.hero .sub {
+  color: #B8C2D1;
+  font-size: 14px;
+  margin-bottom: 22px;
+}
+.hero .sub strong { color: #fff; font-weight: 500; }
+
+.badges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.badge {
+  background: var(--navy-soft);
+  border: 1px solid #2A3A50;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #B8C2D1;
+}
+.badge .num {
+  display: block;
+  font-family: 'Georgia', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+.badge.a .num { color: var(--teal); }
+.badge.b .num { color: var(--warn); }
+.badge.c .num { color: #8A93A3; }
+.badge.hl { background: var(--teal); border-color: var(--teal); }
+.badge.hl .num { color: var(--navy); }
+.badge.hl { color: rgba(11,26,43,0.7); }
+
+/* SECTIONS */
+section { padding: 40px 0 8px; }
+section h2 {
+  font-family: 'Georgia', serif;
+  font-size: 22px;
+  margin: 0 0 6px;
+  color: var(--navy);
+  font-weight: 600;
+}
+section .lede {
+  color: var(--text-mute);
+  font-size: 14px;
+  margin: 0 0 22px;
+}
+
+/* TOP-10 cards */
+.top10 { display: grid; gap: 12px; }
+.lead-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--teal);
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 14px;
+  align-items: start;
+}
+.lead-card .rank {
+  font-family: 'Georgia', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1;
+  padding-top: 2px;
+}
+.lead-card .body .head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.lead-card .name { font-weight: 600; font-size: 16px; color: var(--navy); }
+.lead-card .meta { font-size: 12px; color: var(--text-mute); }
+.lead-card .opener {
+  margin: 6px 0 4px;
+  color: var(--text);
+  font-style: italic;
+  line-height: 1.45;
+}
+.lead-card .reasons {
+  font-size: 12px;
+  color: var(--text-mute);
+}
+.lead-card .reasons strong { color: var(--navy); font-weight: 500; font-style: normal; }
+.lead-card .score-box {
+  text-align: right;
+  min-width: 80px;
+}
+.lead-card .score-box .score {
+  font-family: 'Georgia', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--teal);
+  line-height: 1;
+}
+.lead-card .score-box .cat {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--teal-soft);
+  color: #1B7A5A;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* RANKED TABLE */
+table.ranked {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 13px;
+}
+table.ranked th {
+  background: var(--cream);
+  color: var(--navy);
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--line);
+}
+table.ranked td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+table.ranked tr:last-child td { border-bottom: none; }
+table.ranked tr.cat-a { background: rgba(62,207,160,0.05); }
+table.ranked tr.cat-a td:first-child { border-left: 3px solid var(--teal); }
+table.ranked tr.cat-b { background: rgba(232,154,60,0.04); }
+table.ranked tr.cat-b td:first-child { border-left: 3px solid var(--warn); }
+table.ranked tr.cat-c { background: rgba(184,84,80,0.03); color: var(--text-mute); }
+table.ranked tr.cat-c td:first-child { border-left: 3px solid var(--danger); }
+table.ranked .tier {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--cream);
+  color: var(--text-mute);
+  letter-spacing: 0.5px;
+}
+table.ranked .tier.minimal { background: #EEEFF3; color: #4A5466; }
+table.ranked .score-cell {
+  font-family: 'Georgia', serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--navy);
+}
+table.ranked .cat-pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+table.ranked tr.cat-a .cat-pill { background: var(--teal); color: var(--navy); }
+table.ranked tr.cat-b .cat-pill { background: var(--warn); color: #fff; }
+table.ranked tr.cat-c .cat-pill { background: var(--danger); color: #fff; }
+table.ranked .reasons-cell { color: var(--text-mute); font-size: 12px; }
+table.ranked .action-cell {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 500;
+}
+
+/* SEGMENTS */
+table.segments {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 14px;
+}
+table.segments th {
+  background: var(--cream);
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--line);
+}
+table.segments td {
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+table.segments tr:last-child td { border-bottom: none; }
+table.segments .cat-cell {
+  font-family: 'Georgia', serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+table.segments tr.row-a .cat-cell { color: var(--teal); }
+table.segments tr.row-b .cat-cell { color: var(--warn); }
+table.segments tr.row-c .cat-cell { color: var(--danger); }
+table.segments .recommendation {
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* INSIGHT */
+.insight {
+  background: var(--navy);
+  color: #E8ECF2;
+  padding: 28px 32px;
+  border-radius: 10px;
+  line-height: 1.65;
+}
+.insight h3 {
+  font-family: 'Georgia', serif;
+  font-size: 18px;
+  margin: 0 0 12px;
+  color: var(--teal);
+  font-weight: 600;
+}
+.insight p { margin: 0 0 10px; }
+.insight p:last-child { margin: 0; }
+
+/* FOOTER */
+footer {
+  margin-top: 48px;
+  padding: 24px 0 32px;
+  border-top: 1px solid var(--line);
+  color: var(--text-mute);
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+footer a { color: var(--navy); text-decoration: none; border-bottom: 1px dotted var(--text-mute); }
+
+@media (max-width: 720px) {
+  .hero h1 { font-size: 24px; }
+  .lead-card { grid-template-columns: 36px 1fr; }
+  .lead-card .score-box { grid-column: 2; text-align: left; margin-top: 6px; }
+  table.ranked { font-size: 12px; }
+  table.ranked td, table.ranked th { padding: 8px 8px; }
+  .insight { padding: 20px; }
+}
+
+@media print {
+  body { background: #fff; }
+  header.hero { background: #fff; color: var(--navy); border-bottom: 2px solid var(--navy); }
+  .hero .sub { color: var(--text-mute); }
+  .hero .sub strong { color: var(--navy); }
+  .badge { background: var(--cream); color: var(--text); border-color: var(--line); }
+  .badge .num { color: var(--navy); }
+  .insight { background: var(--cream); color: var(--text); }
+  .insight h3 { color: var(--navy); }
+  section { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>Lead Scoring · {{TITLE}}</h1>
+    <div class="sub">Прогон от <strong>{{DATE}}</strong> · источник: <strong>{{DATA_SOURCE}}</strong> · методология: <strong>{{METHODOLOGY}}</strong></div>
+    <div class="badges">
+      <div class="badge"><span class="num">{{TOTAL}}</span>всего лидов</div>
+      <div class="badge a"><span class="num">{{COUNT_A}}</span>A · приоритет сегодня</div>
+      <div class="badge b"><span class="num">{{COUNT_B}}</span>B · 48ч / nurture</div>
+      <div class="badge c"><span class="num">{{COUNT_C}}</span>C · email / disqualify</div>
+      <div class="badge hl"><span class="num">{{PCT_A}}%</span>воронки в A</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section>
+  <h2>TOP-10 на сегодня</h2>
+  <p class="lede">Кому звонить первыми и что сказать в первые 30 секунд — opener построен по `crm_notes` и сильнейшим сигналам.</p>
+  <div class="top10">
+    <!-- TOP_10_CARDS -->
+    <!-- For each TOP-10 lead, output a block like this:
+    <div class="lead-card">
+      <div class="rank">#1</div>
+      <div class="body">
+        <div class="head">
+          <span class="name">Аскар Жанибеков</span>
+          <span class="meta">id 1002 · webinar · руководитель отдела маркетинга · medium</span>
+        </div>
+        <div class="opener">«Аскар, видел, что вы досмотрели вебинар по AI для бизнеса и спрашивали про корпоративный пакет. Какая зона ответственности — маркетинг целиком или конкретные направления?»</div>
+        <div class="reasons"><strong>Top-3:</strong> вебинар 40мин · «корпоративный пакет на 8» · позиция в ICP</div>
+      </div>
+      <div class="score-box">
+        <div class="score">95</div>
+        <div class="cat">A</div>
+      </div>
+    </div>
+    -->
+  </div>
+</section>
+
+<section>
+  <h2>Полный ранжированный список</h2>
+  <p class="lede">Отсортировано по score DESC. Цвет строки = категория. Tier `minimal` = лид без поведенческих данных, скоринг по `crm_notes` + базовым полям.</p>
+  <table class="ranked">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Tier</th>
+        <th>Score</th>
+        <th>Кат.</th>
+        <th>Top-3 причины</th>
+        <th>Первое действие</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- RANKED_TABLE_ROWS -->
+      <!-- For each lead in ranked order, output:
+      <tr class="cat-a">
+        <td>1002</td>
+        <td>Аскар Жанибеков</td>
+        <td><span class="tier">rich</span></td>
+        <td class="score-cell">95</td>
+        <td><span class="cat-pill">A</span></td>
+        <td class="reasons-cell">вебинар 40мин · корп. пакет · рук-ль маркетинга</td>
+        <td class="action-cell">звонок</td>
+      </tr>
+      Use class "cat-a" / "cat-b" / "cat-c" on the <tr>.
+      Use class "tier minimal" instead of "tier" for minimal leads.
+      -->
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Сегменты воронки</h2>
+  <p class="lede">Раскладка по категориям × tier. Колонка `rich/minimal` показывает, теряются ли лиды из каналов без tracking.</p>
+  <table class="segments">
+    <thead>
+      <tr>
+        <th>Категория</th>
+        <th>Кол-во</th>
+        <th>rich</th>
+        <th>minimal</th>
+        <th>% воронки</th>
+        <th>Рекомендация</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- SEGMENTS_ROWS -->
+      <!-- Output three rows (row-a, row-b, row-c):
+      <tr class="row-a">
+        <td class="cat-cell">A</td>
+        <td>14</td>
+        <td>10</td>
+        <td>4</td>
+        <td>28%</td>
+        <td class="recommendation">Звонить сегодня до 18:00. 4 minimal-лида с сильными buying signals в crm_notes — могут конвертиться быстрее «вебинарных», у них уже есть деньги.</td>
+      </tr>
+      -->
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Инсайт по воронке</h2>
+  <div class="insight">
+    <h3>Что бросилось в глаза</h3>
+    <!-- INSIGHT_PARAGRAPH -->
+    <!-- Output 1-2 <p> blocks with the insight. Example:
+    <p>Половина А-категории — это minimal-лиды. То есть когда tracking не подключён, но менеджер аккуратно прописал crm_notes, лид всё равно поднимается в топ. Это валидирует методологию для компаний без вебинарных платформ.</p>
+    <p>Канал webinar даёт 100% попадание в A или B — самый рентабельный источник. Канал instagram_ads без квалифицирующих вопросов выдаёт половину C-сегмента (студенты, школьники, пенсионеры) — маркетингу: добавить в форму обязательные поля «должность» и «телефон».</p>
+    -->
+  </div>
+</section>
+
+<footer>
+  <div>Lead Scoring · <a href="https://github.com/dkoraitest/ai-camp-lead-scoring">ai-camp-lead-scoring</a> · AI Camp Almaty 2026</div>
+  <div>Скоринг сделан скиллом <code>lead-scoring</code> · scored CSV рядом с этим файлом</div>
+</footer>
+
+</main>
+
+</body>
+</html>
