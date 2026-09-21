@@ -133,7 +133,7 @@ git clone https://github.com/dkoraitest/ai-camp-lead-scoring.git ~/.claude/skill
 
 ## Контакты
 
-Telegram: @dkorobovtsev
+Telegram: [@d_korob](https://t.me/d_korob)
 Email: dkor.aitest@gmail.com
 
 ## License
